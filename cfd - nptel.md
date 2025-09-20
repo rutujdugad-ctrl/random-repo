@@ -1,4 +1,4 @@
-# week 1 assignment
+# week 1 & 2 assignment
 
 - The reformulation is often chosen for numerical convenience, not because it simplifies the order of the equations.
 - The complexity in terms of differential order remains equivalent to the original Navier-Stokes equations.
@@ -263,13 +263,6 @@ Where:
 | Example            | Forward Euler, FTCS, Explicit RK                       | Backward Euler, Crank-Nicolson, DuFort-Frankel        |
 
 ---
-### Quick Stability Check Method
-1. **Von Neumann Analysis:** Look for amplification factor $G$
-   - Stable if $|G| \leq 1$
-   - CFL condition typically: $\Delta t / \Delta x^2 \leq 1/2$ for diffusion
-2. **For diffusion equation:** CFL = $\alpha \Delta t / \Delta x^2 \leq 0.5$
-3. **For wave equation:** CFL = $c \Delta t / \Delta x \leq 1$
-
 ## 2. Order of Accuracy Tips
 
 ### How to Determine Order
@@ -290,12 +283,6 @@ Where:
 - $\frac{f_{i+2} - 2f_{i+1} + f_i}{(\Delta x)^2}$ → Usually 1st or 2nd order
 
 ## 3. Taylor Series Term Identification
-
-### Standard Numbering Convention
-- **Term 1:** $f(x)$ (constant term)
-- **Term 2:** $f'(x) \cdot s$ (first derivative term)
-- **Term 3:** $\frac{f''(x)}{2!} s^2$ (second derivative term)
-- **Term 4:** $\frac{f'''(x)}{3!} s^3$ (third derivative term)
 
 ### Key Formula for MCQs
 For $f(x + s)$ where $s = n\Delta x$:
@@ -374,5 +361,70 @@ $$f(x + n\Delta x) = \sum_{k=0}^\infty \frac{f^{(k)}(x)}{k!} (n\Delta x)^k$$
 - **B**oundary conditions matter
 - **L**eading error term
 - **E**ven/odd terms for error type
----
+
+# CFD Exam Last-Minute Tips & Tricks
+
+### Trick #1: The Peclet Number (Pe) Decider
+
+If a question gives you density, velocity, etc., and asks you to choose a **scheme**, it's a Peclet number question. You don't always have to calculate it perfectly.
+
+1.  **The Magic Number is 2.** Your goal is to figure out if Pe is greater or less than 2.
+    * **Formula:** $$Pe = \frac{\rho u L}{\Gamma}$$
+    * **Watch out for units!** They will try to trick you. In your assignment (Q1), velocity was in `m/min`. You MUST convert it to `m/s` (divide by 60).
+    * `L` is usually the grid size ($\Delta x$). If a 1m pipe has 10 cells, then $L = 1/10 = 0.1$ m.
+
+2.  **The Choice:**
+    * If **Pe > 2** (Convection is strong, like a powerful wind): The flow is one-directional.
+        * **ANSWER -> First-Order UPWIND**.
+    * If **Pe ≤ 2** (Diffusion is strong, like smoke spreading out): The flow is balanced.
+        * **ANSWER -> Second-Order CENTRAL DIFFERENCING**.
+
+**MCQ Pro Tip:** If you see a high velocity and low diffusion, it's probably Upwind. If the velocity is low, it's probably Central Differencing.
+
+### Trick #2: 1D Heat Conduction Shortcuts
+
+These are common sense questions disguised in complex formulas.
+
+* **"What is zero at the boundary?" (Like Q8):**
+    * For the **first node** on the very left (the "West" boundary), the coefficient connecting it to a neighbor further left ($a_W$) is **ALWAYS 0**. There is no node there!
+    * Similarly, for the last node on the right, $a_E$ would be 0.
+    * This is often a free point on an exam.
+
+* **"Find the temperature at the center." (Like Q2):**
+    * Look for the term "heat generation" ($q$).
+    * If there is **NO heat generation** ($q=0$), the temperature in the middle is just the simple average of the ends. Ex: ends are 100°C and 50°C -> middle is 75°C.
+    * If there **IS heat generation**, the middle temperature will be **higher** than the simple average. The heat source adds extra heat!
+
+### Trick #3: Keyword Matching for Schemes (For "Match the Following")
+
+This was Q5 in your assignment. Don't memorize formulas, match keywords.
+
+* **First-Order Upwind Scheme:**
+    * **Keywords:** "Upstream", "one-sided".
+    * **How it works:** It's simple and dumb. It only looks at the node the flow is **coming from**.
+    * **Nodes Used:** Just one, the upstream one ($\phi_W$).
+
+* **Central Differencing Scheme:**
+    * **Keywords:** "Average", "linear interpolation", "centered".
+    * **How it works:** Takes the average of the two nodes on either side.
+    * **Nodes Used:** The two closest neighbors ($\phi_W, \phi_P$).
+
+* **QUICK Scheme:**
+    * **Keywords:** "Quadratic", "three-point", "higher-order", "expensive".
+    * **How it works:** It's the most complicated. It uses a curve (a quadratic) to interpolate.
+    * **Nodes Used:** Three nodes are involved ($\phi_{WW}, \phi_W, \phi_P$).
+    * **MCQ Pro Tip:** If a question asks which scheme is the most **"computationally expensive"**, the answer is almost always **QUICK**.
+
+### Trick #4: Decoding the Wave Equation
+
+This looks scary but it's just a "plug-and-play" problem.
+
+* **The Equation:** $$\frac{\partial u}{\partial t} + c\frac{\partial u}{\partial x} = 0$$
+* **The Task:** They will tell you how to replace the $\frac{\partial}{\partial t}$ and $\frac{\partial}{\partial x}$ parts.
+    * "Forward Euler" for time ($\frac{\partial u}{\partial t}$) means: $$\frac{u_i^{t+\Delta t} - u_i^t}{\Delta t}$$
+    * "Central Differencing" for space ($\frac{\partial u}{\partial x}$) means: $$\frac{u_{i+1}^t - u_{i-1}^t}{2\Delta x}$$
+* **How to Solve:**
+    1.  Substitute these pieces into the main equation.
+    2.  Do the algebra to solve for the "new" temperature ($u_i^{t+\Delta t}$).
+    3.  The final formula will tell you how to find the temperature at a node using its current value and its neighbors' current values. Just follow the math, don't worry about the physics.
 
