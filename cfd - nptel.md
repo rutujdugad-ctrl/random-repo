@@ -376,4 +376,3 @@ $$f(x + n\Delta x) = \sum_{k=0}^\infty \frac{f^{(k)}(x)}{k!} (n\Delta x)^k$$
 - **E**ven/odd terms for error type
 ---
 
-this is temp
